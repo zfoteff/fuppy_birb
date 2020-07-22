@@ -27,6 +27,8 @@ size = width, height = 650, 750
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
+font = pygame.font.Font('assets/OCRA.ttf', 24)
+
 pipe_group = pygame.sprite.Group()
 background_1 = Background(0,0)
 background_2 = Background(background_1.rect.right, 0)
@@ -38,9 +40,10 @@ def main_menu():
     pipe = Pipe()
     logo = Logo()
     player._set_position(100, 250)
+    player.menu = True
+    intro_label = font.render("Press Enter to Start", True, (70, 84, 65))
+
     intro = True
-
-
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event is None:
@@ -55,9 +58,13 @@ def main_menu():
         screen.blit(pipe.image, pipe.rect)
         screen.blit(floor_1.image, floor_1.rect)
         screen.blit(logo.image, logo.rect)
+        screen.blit(intro_label, (10, 500))
         logo.update()
+        player.update()
         clock.tick(15)
         pygame.display.flip()
+
+    player.menu = False
 
 
 def game_loop():
@@ -71,6 +78,7 @@ def game_loop():
 
     while True:
 
+        """  Event Checking   """
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event == None:
                 pygame.quit()
@@ -80,21 +88,20 @@ def game_loop():
                 if event.key == pygame.K_w and player._godmode:
                     player.go_up()
 
-                if event.key == pygame.K_s and player._godmode:
+                elif event.key == pygame.K_s and player._godmode:
                     player.go_down()
 
-                if event.key == pygame.K_d and player._godmode:
+                elif event.key == pygame.K_d and player._godmode:
                     player.go_right()
 
-                if event.key == pygame.K_a and player._godmode:
+                elif event.key == pygame.K_a and player._godmode:
                     player.go_left()
 
-                if event.key == pygame.K_SPACE and mode:
+                if event.key == pygame.K_SPACE and mode and not player._godmode:
                     player.jump()
 
             if event.type == pygame.KEYUP and player._godmode:
                 player.stop()
-
 
         """ Infinite Scrolling Solution """
         pipe_counter = pipe_counter
@@ -142,10 +149,11 @@ def game_loop():
             # If the player passes the right edge of a pipe without dying
             # increase the score by 1
             # The plus three is the last point before the next iteration of pipe starts
-            if player.rect.x + 3 == each.rect.right:
-                score += 10
-                print(score)
+            if player.rect.x + 3 == each.rect.right and player.alive:
+                score += 1
 
+        """  Score Update   """
+        score_label = font.render("Score: "+str(score), True, (70, 84, 65))
 
         """ Sprite Update Methods """
         screen.blit(background_1.image, background_1.rect)
@@ -154,9 +162,11 @@ def game_loop():
         screen.blit(floor_1.image, floor_1.rect)
         screen.blit(floor_2.image, floor_2.rect)
         screen.blit(player.image, player.rect)
+        screen.blit(score_label, (50, 50))
 
+        # If player has hit a pipe and is dead --> rotate the image as it falls
         if not player.alive:
-            player.image = pygame.transform.rotate(player.image, -0.75)
+            player.image = pygame.transform.rotate(player.image, -1.75)
 
         background_1.update()
         background_2.update()

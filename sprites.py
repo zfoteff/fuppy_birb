@@ -12,9 +12,11 @@ class Birb(pygame.sprite.Sprite):
         self.dx = 4
         self.dy = 3
         self.alive = True
+        self.menu = True
         self._godmode = False
 
     def update(self):
+
         if self._godmode:
             self.rect.x += self.dx
             self.rect.y += self.dy
@@ -23,15 +25,15 @@ class Birb(pygame.sprite.Sprite):
             self.rect.y += self.dy
             self.dy += 1.55
 
+            if self.menu and self.rect.y > 400:
+                self.dy = -30
+
             if self.dy > 9:
                 self.dy = 9
 
             if not self.alive and (self.rect.y >= 830 or self.rect.y < -130):
                 self.kill()
 
-
-    def get_rect(self):
-        return self.rect
 
     """
     Sets dy as + which will slowly decrease in the update function
@@ -87,7 +89,7 @@ class Logo(pygame.sprite.Sprite):
     def update (self):
         self.rect.y += self.dy
 
-        if self.rect.y > 240 or self.rect.y <= 180:
+        if self.rect.y > 220 or self.rect.y <= 140:
             self.dy *= -1
 
 
