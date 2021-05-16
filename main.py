@@ -21,7 +21,7 @@ position_arr = [
                 PIPE_POS_3, PIPE_POS_4,
                 PIPE_POS_5, PIPE_POS_6,
                 PIPE_POS_7, PIPE_POS_8
-                ]
+               ]
 
 size = width, height = 650, 750
 screen = pygame.display.set_mode(size)
@@ -76,13 +76,13 @@ def game_loop():
 
     player._set_position(153, 250)
 
-    while True:
-
+    play = True
+    while play:
         """  Event Checking   """
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event == None:
+                play = False
                 pygame.quit()
-                sys.exit(0)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w and player._godmode:
@@ -130,7 +130,6 @@ def game_loop():
         if floor_2.rect.right < 0:
             floor_2.rect.x = floor_1.rect.right
 
-
         """ Collison Checking """
         pipe_hit_list = pygame.sprite.spritecollide(player, pipe_group, False)
 
@@ -161,22 +160,27 @@ def game_loop():
         pipe_group.draw(screen)
         screen.blit(floor_1.image, floor_1.rect)
         screen.blit(floor_2.image, floor_2.rect)
-        screen.blit(player.image, player.rect)
         screen.blit(score_label, (50, 50))
 
-        # If player has hit a pipe and is dead --> rotate the image as it falls
-        if not player.alive:
-            player.image = pygame.transform.rotate(player.image, -1.75)
+        # If the player is killed --> don't continue to update its position
+        # Else --> update position and check for rotation logic
+        if not player.killed:
+            screen.blit(player.image, player.rect)
+            player.update()
+
+            # If player has hit a pipe and is dead --> rotate image as it falls
+            if not player.alive:
+                player.rotate_center(-0.75)
 
         background_1.update()
         background_2.update()
         pipe_group.update()
         floor_1.update()
         floor_2.update()
-        player.update()
 
         clock.tick(60)
         pygame.display.flip()
 
 main_menu()
 game_loop()
+pygame.quit()

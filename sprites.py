@@ -12,6 +12,7 @@ class Birb(pygame.sprite.Sprite):
         self.dx = 4
         self.dy = 3
         self.alive = True
+        self.killed = False
         self.menu = True
         self._godmode = False
 
@@ -31,9 +32,9 @@ class Birb(pygame.sprite.Sprite):
             if self.dy > 9:
                 self.dy = 9
 
-            if not self.alive and (self.rect.y >= 830 or self.rect.y < -130):
+            if not self.alive and (self.rect.y >= 800):
+                self.killed = True
                 self.kill()
-
 
     """
     Sets dy as + which will slowly decrease in the update function
@@ -41,6 +42,13 @@ class Birb(pygame.sprite.Sprite):
     """
     def jump(self):
         self.dy = -20.0
+
+    def rotate_center(self, angle):
+        # Source: http://www.pygame.org/wiki/RotateCenter
+        rotated_image = pygame.transform.rotate(self.image, angle)
+        rotated_rect = rotated_image.get_rect(center=self.rect.center)
+        self.image = rotated_image
+        self.rect = rotated_rect
 
     def go_up(self):
         self.dy = -3
